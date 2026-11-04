@@ -1,5 +1,5 @@
 // App shell cache-first; API network-first with cached fallback (works offline with last data).
-const V = 'tides-v4';
+const V = 'tides-v5';
 const API = /open-meteo\.com|tidesandcurrents\.noaa\.gov|bigdatacloud\.net/;
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'map.js', 'wind.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL))); self.skipWaiting(); });

@@ -7,7 +7,30 @@
 const TideMap = (() => {
   const SPAN_LAT = 1.6, WIND_N = [11, 9], SWELL_N = [13, 11];
   const dark = () => !window.matchMedia || window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const STYLE = () => 'https://tiles.openfreemap.org/styles/' + (dark() ? 'dark' : 'positron');
+  // Esri Ocean basemap: GEBCO/NOAA bathymetry shading, so the shoreline, shelf and drop-offs read through
+  // the wind heat map. Dark mode dims it instead of swapping to a flat dark style. Labels ride on top.
+  const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/';
+  const HEAT_OP = 0.22;
+  const STYLE = () => ({
+    version: 8,
+    glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+    sources: {
+      ocean: { type: 'raster', tiles: [ESRI + 'World_Ocean_Base/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 13,
+        attribution: 'Esri, Garmin, GEBCO, NOAA NGDC, and other contributors' },
+      omt: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },
+      ref: { type: 'raster', tiles: [ESRI + 'World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 13 },
+    },
+    layers: [
+      { id: 'bg', type: 'background', paint: { 'background-color': dark() ? '#0b1b2b' : '#dfe9f0' } },
+      { id: 'ocean', type: 'raster', source: 'ocean', paint: dark()
+        ? { 'raster-brightness-max': 0.6, 'raster-contrast': 0.4, 'raster-saturation': 0.15 }
+        : { 'raster-contrast': 0.15 } },
+      { id: 'coast', type: 'line', source: 'omt', 'source-layer': 'water', filter: ['==', ['get', 'class'], 'ocean'],
+        paint: { 'line-color': dark() ? '#22d3ee' : '#0b3a5c', 'line-opacity': 0.9,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 9, 1.6, 12, 2.4] } },
+      { id: 'ref', type: 'raster', source: 'ref', paint: dark() ? { 'raster-brightness-min': 0.25, 'raster-opacity': 0.9 } : {} },
+    ],
+  });
   const SW_RAMP = [[0, '#9ad1f0'], [1, '#4fb3e8'], [2, '#3b82f6'], [3, '#8b5cf6'], [4.5, '#d946ef'], [6, '#f43f5e']];
   let map = null, loaded = false, visible = false, wanted = null, loc = null, src = null, t = Date.now();
   let wind = null, swell = null, ext = null, meMarker = null, srcMarker = null, fetching = false;
@@ -45,13 +68,13 @@ const TideMap = (() => {
       attributionControl: { compact: true }, dragRotate: false, pitchWithRotate: false, cooperativeGestures: false });
     map.touchZoomRotate.disableRotation();
     WindLayer.init(map, $('#windCanvas'));
-    WindLayer.setBackground(dark() ? 0 : 1); WindLayer.setContrast(dark() ? 0.35 : 0);
+    WindLayer.setBackground(dark() ? 0.3 : 0.85); WindLayer.setContrast(dark() ? 0.3 : 0);
     map.on('load', () => {
       loaded = true;
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
       map.addImage('swarrow', arrowImage(), { sdf: true });
       map.addSource('windheat', { type: 'image', url: blank(), coordinates: [[0, 1], [1, 1], [1, 0], [0, 0]] });
-      map.addLayer({ id: 'windheat', type: 'raster', source: 'windheat', paint: { 'raster-opacity': 0.35, 'raster-fade-duration': 0, 'raster-resampling': 'linear' } }, firstSymbol());
+      map.addLayer({ id: 'windheat', type: 'raster', source: 'windheat', paint: { 'raster-opacity': HEAT_OP, 'raster-fade-duration': 0, 'raster-resampling': 'linear' } }, 'coast');
       map.addSource('swell', { type: 'geojson', data: fc([]) });
       map.addLayer({ id: 'swell-arrows', type: 'symbol', source: 'swell', layout: {
         'icon-image': 'swarrow', 'icon-rotate': ['get', 'rot'], 'icon-rotation-alignment': 'map', 'icon-allow-overlap': true,

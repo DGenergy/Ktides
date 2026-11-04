@@ -26,6 +26,24 @@
 </header>
 
 <main id="main">
+  <section class="card mapcard" id="mapcard">
+    <div class="cardtitle">Wind &amp; swell map <span id="mapTime" class="muted"></span></div>
+    <div class="mapwrap" id="mapwrap">
+      <div id="map"></div>
+      <canvas id="windCanvas"></canvas>
+      <div class="mapbtns">
+        <button id="mapFull" class="icon sm" aria-label="Expand map">⤢</button>
+        <button id="mapCenter" class="icon sm" aria-label="Recentre">◎</button>
+      </div>
+      <button id="mapNote" class="mapnote"></button>
+    </div>
+    <div class="maplegend">
+      <div><span class="lg-title" id="lgW">Wind kn</span><span class="ramp wind"></span><span class="lg-ticks" id="lgWt"></span></div>
+      <div><span class="lg-title" id="lgS">Swell m</span><span class="ramp swell"></span><span class="lg-ticks" id="lgSt"></span></div>
+      <div class="sub">Streaks = wind flow · arrows = swell heading (size = height) · ● you · ○ tide point. Tap map for wind.</div>
+    </div>
+  </section>
+
   <section class="hero card">
     <div>
       <div class="label">Now</div>
@@ -61,23 +79,6 @@
     <div id="hourly" class="hourly"></div>
   </section>
 
-  <section class="card mapcard" id="mapcard">
-    <div class="cardtitle">Wind &amp; swell map <span id="mapTime" class="muted"></span></div>
-    <div class="mapwrap" id="mapwrap">
-      <div id="map"></div>
-      <canvas id="windCanvas"></canvas>
-      <div class="mapbtns">
-        <button id="mapFull" class="icon sm" aria-label="Expand map">⤢</button>
-        <button id="mapCenter" class="icon sm" aria-label="Recentre">◎</button>
-      </div>
-      <button id="mapNote" class="mapnote"></button>
-    </div>
-    <div class="maplegend">
-      <div><span class="lg-title" id="lgW">Wind kn</span><span class="ramp wind"></span><span class="lg-ticks" id="lgWt"></span></div>
-      <div><span class="lg-title" id="lgS">Swell m</span><span class="ramp swell"></span><span class="lg-ticks" id="lgSt"></span></div>
-      <div class="sub">Streaks = wind flow · arrows = swell heading (size = height) · ● you · ○ tide point. Tap map for wind.</div>
-    </div>
-  </section>
 
   <section class="card">
     <div class="cardtitle">Sun &amp; moon</div>

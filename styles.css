@@ -78,7 +78,7 @@ main{max-width:560px;margin:0 auto;padding:0 12px calc(env(safe-area-inset-botto
 .row .del{color:var(--muted);padding:0 6px;font-size:16px}
 .empty{color:var(--muted);font-size:13px;padding:6px 2px 12px}
 
-.mapwrap{position:relative;height:320px;border-radius:14px;overflow:hidden;background:var(--card2)}
+.mapwrap{position:relative;height:min(380px,48vh);border-radius:14px;overflow:hidden;background:var(--card2)}
 .mapwrap.full{position:fixed;inset:0;height:auto;border-radius:0;z-index:40}
 body.noscroll{overflow:hidden}
 #map{position:absolute;inset:0}
