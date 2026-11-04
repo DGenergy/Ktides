@@ -7,6 +7,7 @@ A small, client-only tide PWA for phones. No backend, no API keys.
 - **GPS** location, place search, saved favourites (☆)
 - **Sun & moon**: night shading on the chart, sunrise/sunset, moon phase (hemisphere-correct) and spring/neap hint
 - **Wind & swell**: wind speed/gust/direction and swell height/period/direction, with a 3-hourly strip
+- **Map**: your location and tide point, animated wind particles over a wind-speed heat map (same look as RoamingRadar), and swell arrows sized/coloured by estimated height. Follows the chart time; tap ⤢ for full screen
 - Units: m/ft, kn/km/h/mph. Works offline with the last loaded data
 
 Not for navigation. Model heights are relative to mean sea level and are approximate in harbours/estuaries; NOAA heights are above MLLW.
@@ -31,3 +32,4 @@ On the phone open it in Chrome → ⋮ → **Add to Home screen**.
 - NOAA CO-OPS: `api.tidesandcurrents.noaa.gov` (station list cached 30 days)
 - Open-Meteo: marine, forecast and geocoding APIs
 - BigDataCloud client reverse-geocode (names your GPS spot)
+- OpenFreeMap vector basemap (OSM data), MapLibre GL JS 5.24

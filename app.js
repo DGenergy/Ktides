@@ -74,6 +74,12 @@ const compass = (d) => ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW'
 // arrow pointing the direction the wind/swell travels TO
 const arrow = (from) => `<span class="arrow" style="transform:rotate(${(from + 180) % 360}deg)">↑</span>`;
 
+// shared formatters for map.js
+window.TideFmt = {
+  height: (m) => fH(m, 1), wind: (kn) => `${fW(kn)} ${wU()}`, wConv: (kn) => fW(kn), wUnit: () => wU(), hUnit: () => S.units.h, compass: (d) => compass(d),
+  when: (t) => S.data ? fmt(S.data.tz, t, { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : '',
+};
+
 // ---------- NOAA ----------
 async function noaaStations() {
   const c = load('noaaStations', null);
@@ -226,6 +232,11 @@ async function loadLocation(loc, { quiet } = {}) {
     S.data = { tz, tide, wind: fc?.wind || [], sun: fc?.sun || [], waves: waves(mar), st, srcLabel, hasNoaa: !!st };
     $('#locSrc').textContent = srcLabel;
     if (fc) status(null); render();
+    if (typeof TideMap !== 'undefined') {
+      const srcPt = tide.src === 'noaa' ? { lat: st.lat, lon: st.lon, d: st.d, label: 'NOAA ' + st.name }
+        : { lat: cell.lat, lon: cell.lon, d: cell.d, label: 'Model tide point' };
+      TideMap.setLocation(loc, srcPt); renderConditions();
+    }
   } catch (e) {
     console.error(e); status('Couldn’t load: ' + e.message, 6000);
   }
@@ -308,6 +319,7 @@ function renderConditions() {
   const d = S.data, [t0] = dayBounds();
   const t = S.scrubT ?? (S.day === 0 ? Date.now() : t0 + 12 * H);
   $('#condAt').textContent = '· ' + (S.scrubT || S.day ? fmt(d.tz, t, { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : 'now');
+  if (typeof TideMap !== 'undefined') TideMap.setTime(t);
   const w = nearest(d.wind, t), v = nearest(d.waves, t);
   $('#windNow').innerHTML = w ? `${arrow(w.d)} ${fW(w.s)} <small>${wU()}</small>` : '–';
   $('#windSub').textContent = w ? `${compass(w.d)} · gusts ${fW(w.g)}` : '';
@@ -318,7 +330,8 @@ function renderConditions() {
 function renderHourly(t0, t1) {
   const d = S.data, now = Date.now(); let html = '';
   for (let t = t0; t < t1; t += 3 * H) {
-    const w = nearest(d.wind, t), v = nearest(d.waves, t);
+    if (typeof TideMap !== 'undefined') TideMap.setTime(t);
+  const w = nearest(d.wind, t), v = nearest(d.waves, t);
     const isNow = now >= t && now < t + 3 * H;
     html += `<div class="hr${isNow ? ' now' : ''}"><div class="tm">${fHour(t)}</div>` +
       (w ? `<div>${arrow(w.d)}</div><div class="ws">${fW(w.s)}</div><div class="tm">g${fW(w.g)}</div>` : '<div>–</div>') +
@@ -458,6 +471,11 @@ function init() {
   window.addEventListener('resize', () => S.data && renderDay());
   document.addEventListener('visibilitychange', () => { if (!document.hidden && S.data) render(); });
   setInterval(() => !document.hidden && S.data && S.scrubT == null && render(), 60e3);
+  $('#mapFull').onclick = () => { const w = $('#mapwrap'); w.classList.toggle('full'); document.body.classList.toggle('noscroll', w.classList.contains('full')); $('#mapFull').textContent = w.classList.contains('full') ? '✕' : '⤢'; TideMap.resize(); };
+  $('#mapCenter').onclick = () => TideMap.recenter();
+  $('#mapNote').onclick = () => TideMap.retry();
+  if ('IntersectionObserver' in window) new IntersectionObserver((es) => es.forEach((e) => TideMap.setVisible(e.isIntersecting)), { rootMargin: '200px' }).observe($('#mapcard'));
+  else TideMap.setVisible(true);
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   if (S.loc) loadLocation(S.loc); else useGps();
 }

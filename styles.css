@@ -77,3 +77,26 @@ main{max-width:560px;margin:0 auto;padding:0 12px calc(env(safe-area-inset-botto
 .row small{color:var(--muted);display:block}
 .row .del{color:var(--muted);padding:0 6px;font-size:16px}
 .empty{color:var(--muted);font-size:13px;padding:6px 2px 12px}
+
+.mapwrap{position:relative;height:320px;border-radius:14px;overflow:hidden;background:var(--card2)}
+.mapwrap.full{position:fixed;inset:0;height:auto;border-radius:0;z-index:40}
+body.noscroll{overflow:hidden}
+#map{position:absolute;inset:0}
+#windCanvas{position:absolute;inset:0;pointer-events:none}
+.mapbtns{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.mapwrap.full .mapbtns{top:calc(env(safe-area-inset-top) + 10px)}
+.mapbtns .icon{box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.mapnote{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:var(--card);color:var(--ink);font-size:12px;padding:5px 10px;border-radius:12px;z-index:2}
+.mapnote:empty{display:none}
+.me-dot{width:16px;height:16px;border-radius:50%;background:#f472b6;border:3px solid #fff;box-shadow:0 0 0 6px rgba(244,114,182,.3)}
+.src-dot{width:12px;height:12px;border-radius:50%;background:transparent;border:2.5px solid #fbbf24;cursor:pointer}
+.maplibregl-popup-content{background:var(--card);color:var(--ink);border-radius:10px;padding:6px 10px;font-size:13px}
+.maplibregl-popup-tip{display:none}
+.maplegend{margin-top:10px;display:grid;gap:8px;font-size:11px;color:var(--muted)}
+.maplegend>div:not(.sub){display:grid;grid-template-columns:58px 1fr;grid-template-rows:auto auto;column-gap:8px}
+.lg-title{grid-row:1/3;align-self:center}
+.ramp{height:8px;border-radius:4px}
+.ramp.wind{background:linear-gradient(90deg,#7FA7C4 0%,#6FBFD8 10%,#5FD68A 20%,#C9DE7A 30%,#F0C95A 40%,#F0A35A 50%,#E8774F 60%,#E0554D 80%,#C41E9F 100%)}
+.ramp.swell{background:linear-gradient(90deg,#9ad1f0 0%,#4fb3e8 16%,#3b82f6 33%,#8b5cf6 50%,#d946ef 75%,#f43f5e 100%)}
+.lg-ticks{display:flex;justify-content:space-between}
+.lg-ticks i{font-style:normal}
